@@ -1,18 +1,26 @@
 import { IttyRequest, Env } from "./types";
+import mime from "mime-types";
 
 async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
   if (!req.params || !req.params.id || !req.params.file) {
     return Response.json({ error: "Missing id or file" }, { status: 400 });
   }
   const { id, file } = req.params;
-  const res = await env.BUCKET.get(`${id}/${decodeURI(file)}`);
+  const fileDecoded = decodeURIComponent(file);
+  const res = await env.BUCKET.get(`${id}/${fileDecoded}`);
   if (!res) {
     return Response.json({ error: "File not found" }, { status: 404 });
   }
+  const contentType =
+    res.httpMetadata.contentType ||
+    mime.lookup(fileDecoded) ||
+    "application/octet-stream";
+
   return new Response(res.body, {
     status: 200,
     headers: {
-      "Content-Disposition": `attachment; filename="${file}"`,
+      "Content-Type": contentType,
+      "Content-Disposition": `attachment; filename="${fileDecoded}"`,
       "Content-Length": `${res.size}`,
     },
   });

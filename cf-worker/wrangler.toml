@@ -3,6 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2022-07-16"
 routes = ["transfer.uuid.rocks/*"]
 usage_model = "unbound"
+node_compat = true
 
 [[r2_buckets]]
 binding = 'BUCKET'
