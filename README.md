@@ -6,7 +6,6 @@ However, having Railway proxy file downloads can be somewhat slow. So I used a W
 1. Deploy this repo to Railway with the following variables:
 
 ```
-S3_NO_MULTIPART=true
 LISTENER=8080
 PURGE_DAYS=1
 PROVIDER=s3
