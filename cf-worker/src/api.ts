@@ -5,7 +5,7 @@ async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
     return Response.json({ error: "Missing id or file" }, { status: 400 });
   }
   const { id, file } = req.params;
-  const res = await env.BUCKET.get(`${id}/${file}`);
+  const res = await env.BUCKET.get(`${id}/${decodeURI(file)}`);
   if (!res) {
     return Response.json({ error: "File not found" }, { status: 404 });
   }
