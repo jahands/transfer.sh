@@ -56,6 +56,7 @@ async function recordToDB(
       req.headers.get("Content-Type") ||
       mime.lookup(fileDecoded) ||
       "application/octet-stream";
+    const ip = req.headers.get("CF-Connecting-IP") || "";
     // Record the upload to DB
     const upload: Upload = {
       upload_id: -1, // no-op, DB will assign an ID
@@ -72,18 +73,26 @@ async function recordToDB(
     if (upload.name && upload.name.length > 0 && upload.content_length > 0) {
       const stmts = [
         env.DB.prepare(
+          `INSERT OR IGNORE INTO ips (ip) VALUES (?)`
+        ).bind(ip),
+        env.DB.prepare(
           `INSERT OR IGNORE INTO content_types (content_type) VALUES (?)`
         ).bind(contentType),
         env.DB.prepare(
-          `INSERT INTO uploads (name, content_type_id, content_length, created_on)
-            VALUES (?,
+          `INSERT INTO uploads (name, content_type_id, content_length, created_on, ip_id)
+            VALUES (
+              ?,
               (SELECT content_type_id FROM content_types WHERE content_type=?),
-            ?, ?)`
+              ?,
+              ?,
+              (SELECT ip_id FROM ips WHERE ip=?)
+            )`
         ).bind(
           upload.name,
           contentType,
           upload.content_length,
-          upload.created_on
+          upload.created_on,
+          ip
         ),
       ];
       ctx.waitUntil(env.DB.batch(stmts));
