@@ -42,7 +42,12 @@ export interface Env {
 export type Upload = {
   upload_id: number
   name: string
-  content_type: string
+  content_type_id: number
   content_length: number
   created_on: number
+}
+
+export type ContentType = {
+  content_type_id: number
+  content_type: string
 }

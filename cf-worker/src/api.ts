@@ -52,12 +52,13 @@ async function recordToDB(
     const url = new URL(req.url);
     const file = url.pathname.split("/").pop() || "";
     const fileDecoded = decodeURIComponent(file);
+    const contentType =
+      req.headers.get("Content-Type") || mime.lookup(fileDecoded) || "";
     // Record the upload to DB
     const upload: Upload = {
       upload_id: -1, // no-op, DB will assign an ID
       name: fileDecoded,
-      content_type:
-        req.headers.get("Content-Type") || mime.lookup(fileDecoded) || "",
+      content_type_id: -1, // no-op, DB will assign a content type ID
       // X-Content-Length is for when we just want to record to DB, not actually upload bytes
       content_length: parseInt(
         req.headers.get("Content-Length") ||
@@ -67,15 +68,23 @@ async function recordToDB(
       created_on: Date.now(),
     };
     if (upload.name && upload.name.length > 0 && upload.content_length > 0) {
-      const stmt = env.DB.prepare(
-        `INSERT INTO uploads (name, content_type, content_length, created_on) VALUES (?, ?, ?, ?)`
-      ).bind(
-        upload.name,
-        upload.content_type,
-        upload.content_length,
-        upload.created_on
-      );
-      ctx.waitUntil(stmt.run());
+      const stmts = [
+        env.DB.prepare(
+          `INSERT OR IGNORE into content_types (content_type) VALUES (?)`
+        ).bind(contentType),
+        env.DB.prepare(
+          `INSERT INTO uploads (name, content_type_id, content_length, created_on)
+            VALUES (?,
+              (SELECT content_type_id FROM content_types WHERE content_type=?),
+            ?, ?)`
+        ).bind(
+          upload.name,
+          contentType,
+          upload.content_length,
+          upload.created_on
+        ),
+      ];
+      ctx.waitUntil(env.DB.batch(stmts));
     }
   }
 }
