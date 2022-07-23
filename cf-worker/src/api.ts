@@ -53,7 +53,9 @@ async function recordToDB(
     const file = url.pathname.split("/").pop() || "";
     const fileDecoded = decodeURIComponent(file);
     const contentType =
-      req.headers.get("Content-Type") || mime.lookup(fileDecoded) || "";
+      req.headers.get("Content-Type") ||
+      mime.lookup(fileDecoded) ||
+      "application/octet-stream";
     // Record the upload to DB
     const upload: Upload = {
       upload_id: -1, // no-op, DB will assign an ID
