@@ -8,3 +8,8 @@ node_compat = true
 [[r2_buckets]]
 binding = 'BUCKET'
 bucket_name = 'transfer-sh'
+
+[[ d1_databases ]]
+binding = "DB"
+database_name = "transfer-sh"
+database_id = "cfff07bc-9091-4921-80df-7babff62817b"

@@ -1,4 +1,4 @@
-import { IttyRequest, Env } from "./types";
+import type { IttyRequest, Env, Upload } from "./types";
 import mime from "mime-types";
 
 async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
@@ -38,16 +38,51 @@ async function getFileOrPassthrough(
   return getFile(req, env, _ctx);
 }
 
-async function passthrough(
-  req: IttyRequest,
-  _env: Env,
-  _ctx: ExecutionContext
-) {
+async function passthrough(req: IttyRequest, env: Env, ctx: ExecutionContext) {
   return fetch(req as Request);
+}
+
+// Middleware that records the upload to the DB
+async function recordToDB(
+  req: IttyRequest,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<void> {
+  if (req.method === "PUT" && req instanceof Request) {
+    const url = new URL(req.url);
+    const file = url.pathname.split("/").pop() || "";
+    const fileDecoded = decodeURIComponent(file);
+    // Record the upload to DB
+    const upload: Upload = {
+      upload_id: -1, // no-op, DB will assign an ID
+      name: fileDecoded,
+      content_type:
+        req.headers.get("Content-Type") || mime.lookup(fileDecoded) || "",
+      // X-Content-Length is for when we just want to record to DB, not actually upload bytes
+      content_length: parseInt(
+        req.headers.get("Content-Length") ||
+          req.headers.get("X-Content-Length") ||
+          "-1"
+      ),
+      created_on: Date.now(),
+    };
+    if (upload.name && upload.name.length > 0 && upload.content_length > 0) {
+      const stmt = env.DB.prepare(
+        `INSERT INTO uploads (name, content_type, content_length, created_on) VALUES (?, ?, ?, ?)`
+      ).bind(
+        upload.name,
+        upload.content_type,
+        upload.content_length,
+        upload.created_on
+      );
+      ctx.waitUntil(stmt.run());
+    }
+  }
 }
 
 export default {
   getFile,
   getFileOrPassthrough,
   passthrough,
+  recordToDB,
 };

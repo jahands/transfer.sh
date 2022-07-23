@@ -1,4 +1,5 @@
 import { Request as IttyRequest } from "itty-router";
+import type { Database } from "@cloudflare/d1";
 
 export type IttyRequest = IttyRequest;
 
@@ -34,5 +35,14 @@ export type Handler = (
 ) => Promise<Response>;
 
 export interface Env {
+  DB: Database;
 	BUCKET: R2Bucket;
+}
+
+export type Upload = {
+  upload_id: number
+  name: string
+  content_type: string
+  content_length: number
+  created_on: number
 }
