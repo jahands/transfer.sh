@@ -72,7 +72,7 @@ async function recordToDB(
     if (upload.name && upload.name.length > 0 && upload.content_length > 0) {
       const stmts = [
         env.DB.prepare(
-          `INSERT OR IGNORE into content_types (content_type) VALUES (?)`
+          `INSERT OR IGNORE INTO content_types (content_type) VALUES (?)`
         ).bind(contentType),
         env.DB.prepare(
           `INSERT INTO uploads (name, content_type_id, content_length, created_on)
