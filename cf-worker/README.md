@@ -4,5 +4,17 @@
 
 ### Get uploads and join content types
 ```sql
+SELECT
+  u.upload_id,
+  u.name,
+  u.content_length,
+  strftime('%Y-%m-%d %H:%M:%S', datetime(created_on/1000,'unixepoch')) created_on,
+  ct.content_type,
+  ips.ip
+FROM uploads u
+JOIN content_types ct ON u.content_type_id = ct.content_type_id
+JOIN ips ON u.ip_id = ips.ip_id;
+
+-- COMPACT:
 select u.upload_id,u.name,u.content_length,strftime('%Y-%m-%d %H:%M:%S', datetime(created_on/1000,'unixepoch')) created_on,ct.content_type,ips.ip from uploads u join content_types ct on u.content_type_id=ct.content_type_id join ips on u.ip_id=ips.ip_id;
 ```
