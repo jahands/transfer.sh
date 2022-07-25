@@ -1,29 +1,29 @@
-import type { IttyRequest, Env, Upload } from "./types";
-import mime from "mime-types";
+import type { IttyRequest, Env, Upload } from './types'
+import mime from 'mime-types'
 
 async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
 	if (!req.params || !req.params.id || !req.params.file) {
-		return Response.json({ error: "Missing id or file" }, { status: 400 });
+		return Response.json({ error: 'Missing id or file' }, { status: 400 })
 	}
-	const { id, file } = req.params;
-	const fileDecoded = decodeURIComponent(file);
-	const res = await env.BUCKET.get(`${id}/${fileDecoded}`);
+	const { id, file } = req.params
+	const fileDecoded = decodeURIComponent(file)
+	const res = await env.BUCKET.get(`${id}/${fileDecoded}`)
 	if (!res) {
-		return Response.json({ error: "File not found" }, { status: 404 });
+		return Response.json({ error: 'File not found' }, { status: 404 })
 	}
 	const contentType =
 		res.httpMetadata.contentType ||
 		mime.lookup(fileDecoded) ||
-		"application/octet-stream";
+		'application/octet-stream'
 
 	return new Response(res.body, {
 		status: 200,
 		headers: {
-			"Content-Type": contentType,
-			"Content-Disposition": `attachment; filename="${fileDecoded}"`,
-			"Content-Length": `${res.size}`,
+			'Content-Type': contentType,
+			'Content-Disposition': `attachment; filename="${fileDecoded}"`,
+			'Content-Length': `${res.size}`,
 		},
-	});
+	})
 }
 
 async function getFileOrPassthrough(
@@ -31,15 +31,15 @@ async function getFileOrPassthrough(
 	env: Env,
 	_ctx: ExecutionContext
 ) {
-	const headers = (req as Request).headers;
-	if (headers.get("User-Agent")?.toLowerCase().startsWith("mozilla")) {
-		return passthrough(req, env, _ctx);
+	const headers = (req as Request).headers
+	if (headers.get('User-Agent')?.toLowerCase().startsWith('mozilla')) {
+		return passthrough(req, env, _ctx)
 	}
-	return getFile(req, env, _ctx);
+	return getFile(req, env, _ctx)
 }
 
 async function passthrough(req: IttyRequest, env: Env, ctx: ExecutionContext) {
-	return fetch(req as Request);
+	return fetch(req as Request)
 }
 
 // Middleware that records the upload to the DB
@@ -48,15 +48,15 @@ async function recordToDB(
 	env: Env,
 	ctx: ExecutionContext
 ): Promise<void> {
-	if (req.method === "PUT" && req instanceof Request) {
-		const url = new URL(req.url);
-		const file = url.pathname.split("/").pop() || "";
-		const fileDecoded = decodeURIComponent(file);
+	if (req.method === 'PUT' && req instanceof Request) {
+		const url = new URL(req.url)
+		const file = url.pathname.split('/').pop() || ''
+		const fileDecoded = decodeURIComponent(file)
 		const contentType =
-			req.headers.get("Content-Type") ||
+			req.headers.get('Content-Type') ||
 			mime.lookup(fileDecoded) ||
-			"application/octet-stream";
-		const ip = req.headers.get("CF-Connecting-IP") || "";
+			'application/octet-stream'
+		const ip = req.headers.get('CF-Connecting-IP') || ''
 		// Record the upload to DB
 		const upload: Upload = {
 			upload_id: -1, // no-op, DB will assign an ID
@@ -64,17 +64,15 @@ async function recordToDB(
 			content_type_id: -1, // no-op, DB will assign a content type ID
 			// X-Content-Length is for when we just want to record to DB, not actually upload bytes
 			content_length: parseInt(
-				req.headers.get("Content-Length") ||
-					req.headers.get("X-Content-Length") ||
-					"-1"
+				req.headers.get('Content-Length') ||
+					req.headers.get('X-Content-Length') ||
+					'-1'
 			),
 			created_on: Date.now(),
-		};
+		}
 		if (upload.name && upload.name.length > 0 && upload.content_length > 0) {
 			const stmts = [
-				env.DB.prepare(
-					`INSERT OR IGNORE INTO ips (ip) VALUES (?)`
-				).bind(ip),
+				env.DB.prepare(`INSERT OR IGNORE INTO ips (ip) VALUES (?)`).bind(ip),
 				env.DB.prepare(
 					`INSERT OR IGNORE INTO content_types (content_type) VALUES (?)`
 				).bind(contentType),
@@ -94,8 +92,8 @@ async function recordToDB(
 					upload.created_on,
 					ip
 				),
-			];
-			ctx.waitUntil(env.DB.batch(stmts));
+			]
+			ctx.waitUntil(env.DB.batch(stmts))
 		}
 	}
 }
@@ -105,4 +103,4 @@ export default {
 	getFileOrPassthrough,
 	passthrough,
 	recordToDB,
-};
+}

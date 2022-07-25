@@ -10,10 +10,20 @@
 	"private": true,
 	"scripts": {
 		"start": "wrangler dev",
-		"deploy": "wrangler publish"
+		"deploy": "wrangler publish",
+		"pretty": "prettier --write \"./**/*.{ts,json}\""
+	},
+	"prettier": {
+		"trailingComma": "es5",
+		"tabWidth": 2,
+		"semi": false,
+		"singleQuote": true,
+		"printWidth": 80,
+		"useTabs": true
 	},
 	"dependencies": {
 		"@cloudflare/d1": "^1.4.1",
-		"itty-router": "^2.6.1"
+		"itty-router": "^2.6.1",
+		"prettier": "^2.7.1"
 	}
 }
