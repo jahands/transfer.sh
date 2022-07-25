@@ -82,10 +82,10 @@ async function recordToDB(
           `INSERT INTO uploads (name, content_type_id, content_length, created_on, ip_id)
             VALUES (
               ?,
-              (SELECT content_type_id FROM content_types WHERE content_type=?),
+              (SELECT content_type_id FROM content_types WHERE content_type=? LIMIT 1),
               ?,
               ?,
-              (SELECT ip_id FROM ips WHERE ip=?)
+              (SELECT ip_id FROM ips WHERE ip=? LIMIT 1)
             )`
         ).bind(
           upload.name,
