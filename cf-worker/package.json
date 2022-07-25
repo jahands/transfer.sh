@@ -1,19 +1,19 @@
 {
-  "name": "transfer-sh-dl-proxy",
-  "version": "0.0.0",
-  "devDependencies": {
-    "@cloudflare/workers-types": "^3.14.1",
-    "@types/mime-types": "^2.1.1",
-    "typescript": "^4.7.4",
-    "wrangler": "^0.0.0-1f694d6"
-  },
-  "private": true,
-  "scripts": {
-    "start": "wrangler dev",
-    "deploy": "wrangler publish"
-  },
-  "dependencies": {
-    "@cloudflare/d1": "^1.4.1",
-    "itty-router": "^2.6.1"
-  }
+	"name": "transfer-sh-dl-proxy",
+	"version": "0.0.0",
+	"devDependencies": {
+		"@cloudflare/workers-types": "^3.14.1",
+		"@types/mime-types": "^2.1.1",
+		"typescript": "^4.7.4",
+		"wrangler": "^0.0.0-1f694d6"
+	},
+	"private": true,
+	"scripts": {
+		"start": "wrangler dev",
+		"deploy": "wrangler publish"
+	},
+	"dependencies": {
+		"@cloudflare/d1": "^1.4.1",
+		"itty-router": "^2.6.1"
+	}
 }
