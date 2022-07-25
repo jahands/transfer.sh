@@ -1,3 +1,7 @@
+-- npx d1-console@latest
+-- use transfer-sh
+-- <run queries>
+
 SELECT
   u.upload_id,
   u.name,
