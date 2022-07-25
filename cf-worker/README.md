@@ -31,5 +31,5 @@ select ips.ip, count(ips.ip) as upload_count from uploads u join ips on ips.ip_i
 select ct.content_type, count(ct.content_type) as upload_count from uploads u join content_types ct on ct.content_type_id=u.content_type_id group by ct.content_type order by upload_count;
 
 --Size of uploads per content type:
-select content_type,printf("%,d",total_size) from (select ct.content_type, sum(u.content_length) as total_size from uploads u join content_types ct on ct.content_type_id=u.content_type_id group by ct.content_type order by total_size);
+select content_type,printf("%,d",total_size) as total_size from (select ct.content_type, sum(u.content_length) as total_size from uploads u join content_types ct on ct.content_type_id=u.content_type_id group by ct.content_type order by total_size);
 ```
