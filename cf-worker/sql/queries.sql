@@ -1,7 +1,6 @@
 -- npx d1-console@latest
 -- use transfer-sh
 -- <run queries>
-
 SELECT
   u.upload_id,
   u.name,
@@ -60,17 +59,26 @@ FROM
 ORDER BY
   created_on;
 
--- Uploads per IP:
+--Size and count of uploads per IP
 SELECT
-  ips.ip,
-  count(ips.ip) as upload_count
+  ip_address,
+  printf("%,d", total_size) as total_size,
+  upload_count
 FROM
-  uploads u
-  JOIN ips ON ips.ip_id = u.ip_id
-GROUP BY
-  ips.ip
-ORDER BY
-  upload_count;
+  (
+    SELECT
+      ips.ip                as ip_address,
+      sum(u.content_length) as total_size,
+      count(*)              as upload_count
+    FROM
+      uploads u
+      JOIN content_types ct ON ct.content_type_id = u.content_type_id
+      JOIN ips ON u.ip_id = ips.ip_id
+    GROUP BY
+      ips.ip
+    ORDER BY
+      total_size
+  );
 
 -- Uploads per content type:
 SELECT
