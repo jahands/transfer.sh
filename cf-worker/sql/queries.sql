@@ -63,13 +63,23 @@ ORDER BY
 SELECT
   ip_address,
   printf("%,d", total_size) as total_size,
-  upload_count
+  upload_count,
+  strftime(
+    '%Y-%m-%d %H:%M:%S',
+    datetime(upload_first / 1000, 'unixepoch')
+  ) upload_first,
+  strftime(
+    '%Y-%m-%d %H:%M:%S',
+    datetime(upload_last / 1000, 'unixepoch')
+  ) upload_last
 FROM
   (
     SELECT
       ips.ip                as ip_address,
       sum(u.content_length) as total_size,
-      count(*)              as upload_count
+      count(*)              as upload_count,
+      min(created_on)       as upload_first,
+      max(created_on)       as upload_last
     FROM
       uploads u
       JOIN content_types ct ON ct.content_type_id = u.content_type_id
