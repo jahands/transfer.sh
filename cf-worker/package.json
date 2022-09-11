@@ -5,7 +5,7 @@
 		"@cloudflare/workers-types": "^3.14.1",
 		"@types/mime-types": "^2.1.1",
 		"typescript": "^4.7.4",
-		"wrangler": "^0.0.0-1f694d6"
+		"wrangler": "^0.0.0-7c228171"
 	},
 	"private": true,
 	"scripts": {

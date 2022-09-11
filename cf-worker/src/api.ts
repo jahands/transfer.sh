@@ -65,8 +65,8 @@ async function recordToDB(
 			// X-Content-Length is for when we just want to record to DB, not actually upload bytes
 			content_length: parseInt(
 				req.headers.get('Content-Length') ||
-					req.headers.get('X-Content-Length') ||
-					'-1'
+				req.headers.get('X-Content-Length') ||
+				'-1'
 			),
 			created_on: Date.now(),
 		}
@@ -94,6 +94,11 @@ async function recordToDB(
 				),
 			]
 			ctx.waitUntil(env.DB.batch(stmts))
+			ctx.waitUntil(fetch(env.WEBHOOK, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ size: upload.content_length })
+			}))
 		}
 	}
 }

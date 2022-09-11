@@ -37,6 +37,7 @@ export type Handler = (
 export interface Env {
 	DB: Database
 	BUCKET: R2Bucket
+	WEBHOOK: string
 }
 
 export type Upload = {
