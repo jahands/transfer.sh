@@ -38,6 +38,7 @@ export interface Env {
 	DB: Database
 	BUCKET: R2Bucket
 	WEBHOOK: string
+	BLOCKLIST: string
 }
 
 export type Upload = {

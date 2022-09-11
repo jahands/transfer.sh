@@ -93,11 +93,23 @@ async function recordToDB(
 					ip
 				),
 			]
+			let extension: string | null = null
+			if (upload.name.includes('.')) {
+				const parts = upload.name.split('.')
+				const ext = parts[parts.length-1]
+				const blocked = env.BLOCKLIST.split(',')
+				if (!blocked.includes(ext.toLowerCase())) {
+					extension = ext;
+				}
+			}
+			if (!extension) {
+				extension = 'None'
+			}
 			ctx.waitUntil(env.DB.batch(stmts))
 			ctx.waitUntil(fetch(env.WEBHOOK, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ size: upload.content_length })
+				body: JSON.stringify({ size: upload.content_length, extension })
 			}))
 		}
 	}
