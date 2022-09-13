@@ -32,7 +32,8 @@ async function getFileOrPassthrough(
 	_ctx: ExecutionContext
 ) {
 	const headers = (req as Request).headers
-	if (headers.get('User-Agent')?.toLowerCase().startsWith('mozilla')) {
+	const isGoogleDocs = headers.get('User-Agent')?.includes('GoogleDocs')
+	if (!isGoogleDocs && headers.get('User-Agent')?.toLowerCase().startsWith('mozilla')) {
 		return passthrough(req, env, _ctx)
 	}
 	return getFile(req, env, _ctx)
