@@ -32,7 +32,7 @@ async function getFileOrPassthrough(
 	_ctx: ExecutionContext
 ) {
 	const headers = (req as Request).headers
-	const isGoogleDocs = headers.get('User-Agent')?.includes('GoogleDocs')
+	const isGoogleDocs = ['Google.Sheets', 'GoogleDocs'].some((str) => headers.get('User-Agent')?.includes(str))
 	if (!isGoogleDocs && headers.get('User-Agent')?.toLowerCase().startsWith('mozilla')) {
 		return passthrough(req, env, _ctx)
 	}
@@ -97,7 +97,7 @@ async function recordToDB(
 			let extension: string | null = null
 			if (upload.name.includes('.')) {
 				const parts = upload.name.split('.')
-				const ext = parts[parts.length-1]
+				const ext = parts[parts.length - 1]
 				const blocked = env.BLOCKLIST.split(',')
 				if (!blocked.includes(ext.toLowerCase())) {
 					extension = ext;
