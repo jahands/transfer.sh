@@ -1,6 +1,12 @@
 import type { IttyRequest, Env, Upload } from './types'
 import mime from 'mime-types'
 
+export const defaultCors = {
+	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Methods': '*',
+	'Access-Control-Allow-Headers': '*',
+}
+
 async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
 	if (!req.params || !req.params.id || !req.params.file) {
 		return Response.json({ error: 'Missing id or file' }, { status: 400 })
@@ -22,6 +28,7 @@ async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
 			'Content-Type': contentType,
 			'Content-Disposition': `attachment; filename="${fileDecoded}"`,
 			'Content-Length': `${res.size}`,
+			...defaultCors,
 		},
 	})
 }
@@ -40,7 +47,12 @@ async function getFileOrPassthrough(
 }
 
 async function passthrough(req: IttyRequest, env: Env, ctx: ExecutionContext) {
-	return fetch(req as Request)
+	const res = await fetch(req as Request)
+	const newRes = new Response(res.body, res)
+	for(const [key, value] of Object.entries(defaultCors)) {
+		newRes.headers.set(key, value)
+	}
+	return newRes
 }
 
 // Middleware that records the upload to the DB
