@@ -5,5 +5,5 @@ package overrides
 
 const (
 	S3PartSize    = 50 * 1024 * 1024
-	S3Concurrency = 8
+	S3Concurrency = 10
 )
