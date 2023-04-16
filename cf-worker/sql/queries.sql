@@ -6,8 +6,8 @@ SELECT
   u.name,
   u.content_length,
   strftime(
-    '%Y-%m-%d %H:%M:%S',
-    datetime(created_on / 1000, 'unixepoch')
+    "%Y-%m-%d %H:%M:%S",
+    datetime(created_on / 1000, "unixepoch")
   ) created_on,
   ct.content_type,
   ips.ip
@@ -22,8 +22,8 @@ SELECT
   u.name,
   u.content_length,
   strftime(
-    '%Y-%m-%d %H:%M:%S',
-    datetime(created_on / 1000, 'unixepoch')
+    "%Y-%m-%d %H:%M:%S",
+    datetime(created_on / 1000, "unixepoch")
   ) created_on,
   ct.content_type,
   ips.ip
@@ -42,8 +42,8 @@ FROM
       u.name,
       printf("%,d", content_length) as size,
       strftime(
-        '%Y-%m-%d %H:%M:%S',
-        datetime(created_on / 1000, 'unixepoch')
+        "%Y-%m-%d %H:%M:%S",
+        datetime(created_on / 1000, "unixepoch")
       ) created_on,
       ct.content_type,
       ips.ip
@@ -65,12 +65,12 @@ SELECT
   printf("%,d", total_size) as total_size,
   upload_count,
   strftime(
-    '%Y-%m-%d %H:%M:%S',
-    datetime(upload_first / 1000, 'unixepoch')
+    "%Y-%m-%d %H:%M:%S",
+    datetime(upload_first / 1000, "unixepoch")
   ) upload_first,
   strftime(
-    '%Y-%m-%d %H:%M:%S',
-    datetime(upload_last / 1000, 'unixepoch')
+    "%Y-%m-%d %H:%M:%S",
+    datetime(upload_last / 1000, "unixepoch")
   ) upload_last
 FROM
   (
