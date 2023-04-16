@@ -4,6 +4,6 @@ package overrides
 // so that it would work better for me.
 
 const (
-	S3PartSize    = 5 * 1024 * 1024
-	S3Concurrency = 2 // R2 only works with up to 2 concurrency
+	S3PartSize    = 50 * 1024 * 1024
+	S3Concurrency = 8
 )
