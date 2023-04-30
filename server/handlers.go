@@ -456,7 +456,8 @@ func metadataForRequest(contentType string, randomTokenLength int, r *http.Reque
 
 func (s *Server) putHandler(w http.ResponseWriter, r *http.Request) {
 	// Try to limit concurrent uploads
-	for s.concurrentUploads > 100 {
+	concurrencyLimit := 200
+	for s.concurrentUploads >= concurrencyLimit {
 		time.Sleep(time.Millisecond * 100)
 	}
 	s.concurrentUploads++
