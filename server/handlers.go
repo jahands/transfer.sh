@@ -36,7 +36,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/dutchcoders/transfer.sh/server/storage"
 	"html"
 	htmlTemplate "html/template"
 	"io"
@@ -53,6 +52,8 @@ import (
 	"sync"
 	textTemplate "text/template"
 	"time"
+
+	"github.com/dutchcoders/transfer.sh/server/storage"
 
 	web "github.com/dutchcoders/transfer.sh-web"
 	"github.com/gorilla/mux"
@@ -454,6 +455,15 @@ func metadataForRequest(contentType string, randomTokenLength int, r *http.Reque
 }
 
 func (s *Server) putHandler(w http.ResponseWriter, r *http.Request) {
+	// Try to limit concurrent uploads
+	for s.concurrentUploads > 100 {
+		time.Sleep(time.Millisecond * 100)
+	}
+	s.concurrentUploads++
+	defer func() {
+		s.concurrentUploads--
+	}()
+
 	vars := mux.Vars(r)
 
 	filename := sanitize(vars["filename"])

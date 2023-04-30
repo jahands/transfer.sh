@@ -364,6 +364,8 @@ type Server struct {
 	Certificate string
 
 	LetsEncryptCache string
+
+	concurrentUploads int
 }
 
 // New is the factory fot Server
