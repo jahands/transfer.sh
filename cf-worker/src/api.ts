@@ -18,7 +18,7 @@ async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
 		return Response.json({ error: 'File not found' }, { status: 404 })
 	}
 	const contentType =
-		res.httpMetadata.contentType ||
+		res.httpMetadata?.contentType ||
 		mime.lookup(fileDecoded) ||
 		'application/octet-stream'
 
