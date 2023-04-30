@@ -10,7 +10,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/dutchcoders/go-virustotal v0.0.0-20140923143438-24cc8e6fa329
-	github.com/dutchcoders/transfer.sh-web v0.0.0-20211215083008-31e11925a9d3
+	github.com/dutchcoders/transfer.sh-web v0.0.0-20220824020025-7240e75c3bb8
 	github.com/elazarl/go-bindata-assetfs v1.0.1
 	github.com/fatih/color v1.10.0
 	github.com/garyburd/redigo v1.6.2 // indirect
@@ -26,7 +26,7 @@ require (
 	github.com/urfave/cli v1.22.5
 	go.opencensus.io v0.22.6 // indirect
 	golang.org/x/crypto v0.0.0-20220131195533-30dcbda58838
-	golang.org/x/net v0.0.0-20220513224357-95641704303c // indirect
+	golang.org/x/net v0.0.0-20220513224357-95641704303c
 	golang.org/x/oauth2 v0.0.0-20210218202405-ba52d332ba99
 	google.golang.org/api v0.40.0
 	google.golang.org/genproto v0.0.0-20210218151259-fe80b386bf06 // indirect
