@@ -15,7 +15,7 @@ router.put(
 	api.recordToDB,
 	() => new Response('', { status: 204 })
 )
-router.put('*', api.recordToDB, api.passthrough)
+router.put('*', api.putFile)
 router.all('*', api.passthrough)
 
 export default {

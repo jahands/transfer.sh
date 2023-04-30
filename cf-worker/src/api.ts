@@ -56,6 +56,15 @@ async function passthrough(req: IttyRequest, env: Env, ctx: ExecutionContext) {
 	return newRes
 }
 
+async function putFile(req: IttyRequest, env: Env, ctx: ExecutionContext) {
+	const res = await passthrough(req, env, ctx)
+	if (res.ok) {
+		// only record successful uploads to db
+		ctx.waitUntil(recordToDB(req, env, ctx))
+	}
+	return res
+}
+
 // Middleware that records the upload to the DB via Queues
 async function recordToDB(
 	req: IttyRequest,
@@ -102,4 +111,5 @@ export default {
 	getFileOrPassthrough,
 	passthrough,
 	recordToDB,
+	putFile,
 }
