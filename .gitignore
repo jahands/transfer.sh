@@ -1,7 +1,6 @@
 build/
 pkg/
 dist/
-src/
 bin/
 *.pyc
 *.egg-info/
