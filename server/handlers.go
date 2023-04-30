@@ -461,7 +461,9 @@ func (s *Server) putHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	s.concurrentUploads++
 	defer func() {
-		s.concurrentUploads--
+		if s.concurrentUploads > 0 {
+			s.concurrentUploads--
+		}
 	}()
 
 	vars := mux.Vars(r)
