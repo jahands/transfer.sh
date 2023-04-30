@@ -1,5 +1,4 @@
 import { Request as IttyRequest } from 'itty-router'
-import type { Database } from '@cloudflare/d1'
 
 export type IttyRequest = IttyRequest
 
@@ -35,21 +34,21 @@ export type Handler = (
 ) => Promise<Response>
 
 export interface Env {
-	DB: Database
+	DB: D1Database
 	BUCKET: R2Bucket
-	WEBHOOK: string
 	BLOCKLIST: string
-}
-
-export type Upload = {
-	upload_id: number
-	name: string
-	content_type_id: number
-	content_length: number
-	created_on: number
+	QUEUE: Queue<QueueData>
 }
 
 export type ContentType = {
 	content_type_id: number
 	content_type: string
+}
+
+export type QueueData = {
+	uploadName: string
+	contentType: string
+	contentLength: number
+	createdOn: number
+	ip: string
 }

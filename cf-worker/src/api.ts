@@ -1,4 +1,5 @@
-import type { IttyRequest, Env, Upload } from './types'
+import pRetry from 'p-retry';
+import type { IttyRequest, Env } from './types'
 import mime from 'mime-types'
 
 export const defaultCors = {
@@ -49,13 +50,13 @@ async function getFileOrPassthrough(
 async function passthrough(req: IttyRequest, env: Env, ctx: ExecutionContext) {
 	const res = await fetch(req as Request)
 	const newRes = new Response(res.body, res)
-	for(const [key, value] of Object.entries(defaultCors)) {
+	for (const [key, value] of Object.entries(defaultCors)) {
 		newRes.headers.set(key, value)
 	}
 	return newRes
 }
 
-// Middleware that records the upload to the DB
+// Middleware that records the upload to the DB via Queues
 async function recordToDB(
 	req: IttyRequest,
 	env: Env,
@@ -70,60 +71,28 @@ async function recordToDB(
 			mime.lookup(fileDecoded) ||
 			'application/octet-stream'
 		const ip = req.headers.get('CF-Connecting-IP') || ''
-		// Record the upload to DB
-		const upload: Upload = {
-			upload_id: -1, // no-op, DB will assign an ID
-			name: fileDecoded,
-			content_type_id: -1, // no-op, DB will assign a content type ID
+		const contentLength = parseInt(
+			req.headers.get('Content-Length') ||
 			// X-Content-Length is for when we just want to record to DB, not actually upload bytes
-			content_length: parseInt(
-				req.headers.get('Content-Length') ||
-				req.headers.get('X-Content-Length') ||
-				'-1'
-			),
-			created_on: Date.now(),
-		}
-		if (upload.name && upload.name.length > 0 && upload.content_length > 0) {
-			const stmts = [
-				env.DB.prepare(`INSERT OR IGNORE INTO ips (ip) VALUES (?)`).bind(ip),
-				env.DB.prepare(
-					`INSERT OR IGNORE INTO content_types (content_type) VALUES (?)`
-				).bind(contentType),
-				env.DB.prepare(
-					`INSERT INTO uploads (name, content_type_id, content_length, created_on, ip_id)
-						VALUES (
-							?,
-							(SELECT content_type_id FROM content_types WHERE content_type=? LIMIT 1),
-							?,
-							?,
-							(SELECT ip_id FROM ips WHERE ip=? LIMIT 1)
-						)`
-				).bind(
-					upload.name,
-					contentType,
-					upload.content_length,
-					upload.created_on,
-					ip
-				),
-			]
-			let extension: string | null = null
-			if (upload.name.includes('.')) {
-				const parts = upload.name.split('.')
-				const ext = parts[parts.length - 1]
-				const blocked = env.BLOCKLIST.split(',')
-				if (!blocked.includes(ext.toLowerCase())) {
-					extension = ext;
+			req.headers.get('X-Content-Length') ||
+			'-1'
+		)
+		const uploadName = fileDecoded
+		const createdOn = Date.now()
+
+		// Record the upload to DB via Queues
+		if (uploadName && uploadName.length > 0 && contentLength > 0) {
+			await pRetry(async () => env.QUEUE.send({
+				uploadName,
+				contentType,
+				contentLength,
+				createdOn,
+				ip,
+			}), {
+				retries: 5, minTimeout: 1000, randomize: true, onFailedAttempt: async (e) => {
+					console.log('Failed to record to DB, retrying...', e.message)
 				}
-			}
-			if (!extension) {
-				extension = 'None'
-			}
-			ctx.waitUntil(env.DB.batch(stmts))
-			ctx.waitUntil(fetch(env.WEBHOOK, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ size: upload.content_length, extension })
-			}))
+			})
 		}
 	}
 }

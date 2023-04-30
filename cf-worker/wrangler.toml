@@ -13,3 +13,14 @@ bucket_name = 'transfer-sh'
 binding = "DB"
 database_name = "transfer-sh"
 database_id = "cfff07bc-9091-4921-80df-7babff62817b"
+
+[[queues.producers]]
+  queue = "transfer-sh"
+  binding = "QUEUE"
+
+[[queues.consumers]]
+  queue = "transfer-sh"
+  max_batch_size = 100   # Max messages per batch
+  max_batch_timeout = 1  # Max seconds to wait before batch is full
+  max_retries = 3       # Max retries per batch
+  max_concurrency = 1

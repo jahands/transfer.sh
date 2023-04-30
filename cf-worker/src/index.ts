@@ -2,6 +2,7 @@ import { Router } from 'itty-router'
 
 import type { IRequest, IMethods } from './types'
 import api from './api'
+import { handleQueue } from './queue'
 
 const router = Router<IRequest, IMethods>()
 
@@ -19,4 +20,5 @@ router.all('*', api.passthrough)
 
 export default {
 	fetch: router.handle,
+	queue: handleQueue
 }
