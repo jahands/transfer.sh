@@ -456,6 +456,17 @@ func metadataForRequest(contentType string, randomTokenLength int, r *http.Reque
 
 func (s *Server) putHandler(w http.ResponseWriter, r *http.Request) {
 	s.logger.Printf("concurrency: %d", s.concurrentUploads)
+	// Try to limit concurrent uploads
+	concurrencyLimit := 100
+	for s.concurrentUploads >= concurrencyLimit {
+		time.Sleep(time.Millisecond * 100)
+	}
+	s.concurrentUploads++
+	defer func() {
+		if s.concurrentUploads > 0 {
+			s.concurrentUploads--
+		}
+	}()
 
 	vars := mux.Vars(r)
 
@@ -472,17 +483,6 @@ func (s *Server) putHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// Try to limit concurrent uploads
-	concurrencyLimit := 100
-	for s.concurrentUploads >= concurrencyLimit {
-		time.Sleep(time.Millisecond * 100)
-	}
-	s.concurrentUploads++
-	defer func() {
-		if s.concurrentUploads > 0 {
-			s.concurrentUploads--
-		}
-	}()
 
 	// queue file to disk, because s3 needs content length
 	// and clamav prescan scans a file
