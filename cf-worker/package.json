@@ -10,7 +10,7 @@
 	"private": true,
 	"scripts": {
 		"start": "wrangler dev",
-		"deploy": "wrangler publish",
+		"deploy": "wrangler publish --minify",
 		"pretty": "prettier --write \"./**/*.{ts,json}\""
 	},
 	"prettier": {
