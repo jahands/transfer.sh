@@ -11,8 +11,8 @@ bucket_name = 'transfer-sh'
 
 [[ d1_databases ]]
 binding = "DB"
-database_name = "transfer-sh"
-database_id = "cfff07bc-9091-4921-80df-7babff62817b"
+database_name = "transfer-sh-fast"
+database_id = "b53e399d-b9d7-4814-834d-a0e655d4409a"
 
 [[queues.producers]]
   queue = "transfer-sh"

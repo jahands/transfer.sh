@@ -7,8 +7,6 @@ export async function handleQueue(batch: MessageBatch<QueueData>, env: Env, ctx:
   // First we need to insert the IP and content type into their respective tables
   const ips = new Set(batch.messages.map((msg) => msg.body.ip))
   const contentTypes = new Set(batch.messages.map((msg) => msg.body.contentType))
-  // console.log({ ips: Array.from(ips), contentTypes: Array.from(contentTypes) })
-
   const stmts = [
     Array.from(ips).map((ip) => env.DB.prepare(`INSERT OR IGNORE INTO ips (ip) VALUES (?)`).bind(ip)),
     Array.from(contentTypes).map((contentType) =>
@@ -42,14 +40,13 @@ VALUES (
       msg.body.createdOn,
       msg.body.ip
     ))
-
   const uploadRes = await env.DB.batch(uploadStmts)
-  // loop through and ack all successful inserts
+
+
   for (const [idx, res] of uploadRes.entries()) {
     if (res.success) {
       batch.messages[idx].ack()
     } else {
-      console.log(`Failed to insert ${batch.messages[idx].body.uploadName}`)
       batch.messages[idx].retry()
     }
   }
