@@ -57,6 +57,13 @@ async function passthrough(req: IttyRequest, env: Env, ctx: ExecutionContext) {
 }
 
 async function putFile(req: IttyRequest, env: Env, ctx: ExecutionContext) {
+	const url = new URL(req.url)
+	if (url.hostname === 'transfer.geostyx.com') {
+		return new Response('forbidden', {
+			status: 403, statusText: 'Forbidden'
+		})
+	}
+
 	const res = await passthrough(req, env, ctx)
 	if (res.ok) {
 		// only record successful uploads to db
