@@ -36,6 +36,8 @@ export type Handler = (
 export interface Env {
 	DB: D1Database
 	BUCKET: R2Bucket
+	BUCKET_GEO: R2Bucket
+	BUCKET_ARCHIVE: R2Bucket
 	BLOCKLIST: string
 	QUEUE: Queue<QueueData>
 }

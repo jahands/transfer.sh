@@ -8,13 +8,28 @@ export const defaultCors = {
 	'Access-Control-Allow-Headers': '*',
 }
 
+function getBucket(req: IttyRequest, env: Env): R2Bucket {
+	const url = new URL(req.url)
+	if (['transfer.geostyx.com', 'upload.geostyx.com'].includes(url.hostname)) {
+		return env.BUCKET_GEO
+	} else if (['archive.uuid.rocks'].includes(url.hostname)) {
+		return env.BUCKET_ARCHIVE
+	} else if (
+		['transfer.uuid.rocks', 'transfer2.uuid.rocks'].includes(url.hostname)
+	) {
+		return env.BUCKET
+	}
+	throw new Error('Unknown bucket')
+}
+
 async function getFile(req: IttyRequest, env: Env, _ctx: ExecutionContext) {
 	if (!req.params || !req.params.id || !req.params.file) {
 		return Response.json({ error: 'Missing id or file' }, { status: 400 })
 	}
 	const { id, file } = req.params
 	const fileDecoded = decodeURIComponent(file)
-	const res = await env.BUCKET.get(`${id}/${fileDecoded}`)
+	const bucket = getBucket(req, env)
+	const res = await bucket.get(`${id}/${fileDecoded}`)
 	if (!res) {
 		return Response.json({ error: 'File not found' }, { status: 404 })
 	}

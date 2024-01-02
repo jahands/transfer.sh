@@ -8,6 +8,14 @@ node_compat = true
 binding = 'BUCKET'
 bucket_name = 'transfer-sh'
 
+[[r2_buckets]]
+binding = 'BUCKET_GEO'
+bucket_name = 'transfer-geostyx-com'
+
+[[r2_buckets]]
+binding = 'BUCKET_ARCHIVE'
+bucket_name = 'archive-uuid-rocks'
+
 [[ d1_databases ]]
 binding = "DB"
 database_name = "transfer-sh-fast"
