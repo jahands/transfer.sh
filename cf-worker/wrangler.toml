@@ -1,7 +1,7 @@
 name = "transfer-sh-dl-proxy"
 main = "src/index.ts"
 compatibility_date = "2022-07-16"
-routes = ["transfer.uuid.rocks/*","transfer2.uuid.rocks/*","upload.geostyx.com/*","transfer.geostyx.com/*"]
+routes = ["transfer.uuid.rocks/*","transfer2.uuid.rocks/*","upload.geostyx.com/*","transfer.geostyx.com/*","archive.uuid.rocks/*"]
 usage_model = "unbound"
 node_compat = true
 
