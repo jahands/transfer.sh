@@ -20,5 +20,5 @@ router.all('*', api.passthrough)
 
 export default {
 	fetch: router.handle,
-	queue: handleQueue
+	queue: handleQueue,
 }

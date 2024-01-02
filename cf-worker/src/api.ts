@@ -1,4 +1,4 @@
-import pRetry from 'p-retry';
+import pRetry from 'p-retry'
 import type { IttyRequest, Env } from './types'
 import mime from 'mime-types'
 
@@ -40,8 +40,13 @@ async function getFileOrPassthrough(
 	_ctx: ExecutionContext
 ) {
 	const headers = (req as Request).headers
-	const isGoogleDocs = ['Google.Sheets', 'GoogleDocs'].some((str) => headers.get('User-Agent')?.includes(str))
-	if (!isGoogleDocs && headers.get('User-Agent')?.toLowerCase().startsWith('mozilla')) {
+	const isGoogleDocs = ['Google.Sheets', 'GoogleDocs'].some((str) =>
+		headers.get('User-Agent')?.includes(str)
+	)
+	if (
+		!isGoogleDocs &&
+		headers.get('User-Agent')?.toLowerCase().startsWith('mozilla')
+	) {
 		return passthrough(req, env, _ctx)
 	}
 	return getFile(req, env, _ctx)
@@ -60,7 +65,8 @@ async function putFile(req: IttyRequest, env: Env, ctx: ExecutionContext) {
 	const url = new URL(req.url)
 	if (url.hostname === 'transfer.geostyx.com') {
 		return new Response('forbidden', {
-			status: 403, statusText: 'Forbidden'
+			status: 403,
+			statusText: 'Forbidden',
 		})
 	}
 
@@ -89,26 +95,33 @@ async function recordToDB(
 		const ip = req.headers.get('CF-Connecting-IP') || ''
 		const contentLength = parseInt(
 			req.headers.get('Content-Length') ||
-			// X-Content-Length is for when we just want to record to DB, not actually upload bytes
-			req.headers.get('X-Content-Length') ||
-			'-1'
+				// X-Content-Length is for when we just want to record to DB, not actually upload bytes
+				req.headers.get('X-Content-Length') ||
+				'-1'
 		)
 		const uploadName = fileDecoded
 		const createdOn = Date.now()
 
 		// Record the upload to DB via Queues
 		if (uploadName && uploadName.length > 0 && contentLength > 0) {
-			await pRetry(async () => env.QUEUE.send({
-				uploadName,
-				contentType,
-				contentLength,
-				createdOn,
-				ip,
-			}), {
-				retries: 5, minTimeout: 1000, randomize: true, onFailedAttempt: async (e) => {
-					console.log('Failed to record to DB, retrying...', e.message)
+			await pRetry(
+				async () =>
+					env.QUEUE.send({
+						uploadName,
+						contentType,
+						contentLength,
+						createdOn,
+						ip,
+					}),
+				{
+					retries: 5,
+					minTimeout: 1000,
+					randomize: true,
+					onFailedAttempt: async (e) => {
+						console.log('Failed to record to DB, retrying...', e.message)
+					},
 				}
-			})
+			)
 		}
 	}
 }
