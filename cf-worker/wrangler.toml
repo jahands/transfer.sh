@@ -3,6 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2024-01-02"
 routes = ["transfer.uuid.rocks/*","transfer2.uuid.rocks/*","upload.geostyx.com/*","transfer.geostyx.com/*","archive.uuid.rocks/*"]
 node_compat = true
+logpush = true
 
 [[r2_buckets]]
 binding = 'BUCKET'
