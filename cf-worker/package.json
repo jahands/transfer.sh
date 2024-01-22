@@ -13,6 +13,7 @@
 		"deploy": "NO_D1_WARNING=true wrangler deploy --minify src/index.ts",
 		"pretty": "prettier --write \"./**/*.{ts,json}\""
 	},
+	"packageManager": "pnpm@8.14.2",
 	"prettier": {
 		"trailingComma": "es5",
 		"tabWidth": 2,
