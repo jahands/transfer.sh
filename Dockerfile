@@ -16,7 +16,7 @@ RUN CGO_ENABLED=0 go build -tags netgo -ldflags "-X github.com/dutchcoders/trans
 
 RUN mkdir -p /tmp
 
-FROM scratch AS final
+FROM debian:12 AS final
 LABEL maintainer="Andrea Spacca <andrea.spacca@gmail.com>"
 
 COPY --from=build  /go/bin/transfersh /go/bin/transfersh
