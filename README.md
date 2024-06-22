@@ -29,3 +29,9 @@ S3_REGION=auto
 cd cf-worker
 npx wrangler publish
 ```
+
+# Build docker for hosting on my own server
+
+```shell
+earthly --push +docker
+```
