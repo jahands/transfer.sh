@@ -27,11 +27,14 @@ RUN mkdir -p /tmp/useradd /tmp/empty && \
     echo "${RUNAS}:x:${PGID}:" >> /tmp/useradd/group && \
     echo "${RUNAS}:!::" >> /tmp/useradd/groupshadow; else touch /tmp/useradd/unused; fi
 
+RUN mkdir -p /tmp
+
 FROM scratch AS final
 LABEL maintainer="Andrea Spacca <andrea.spacca@gmail.com>"
 ARG RUNAS
 
 COPY --from=build /etc/mime.types /etc/mime.types
+COPY --from=build /tmp /tmp
 COPY --from=build /tmp/empty /tmp
 COPY --from=build /tmp/useradd/* /etc/
 COPY --from=build --chown=${RUNAS}  /go/bin/transfersh /go/bin/transfersh
